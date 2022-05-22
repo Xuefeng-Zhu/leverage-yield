@@ -6,7 +6,7 @@ pragma experimental ABIEncoderV2;
 import {BaseStrategy} from "@badger-finance/BaseStrategy.sol";
 
 contract MyStrategy is BaseStrategy {
-// address public want; // Inherited from BaseStrategy
+    // address public want; // Inherited from BaseStrategy
     // address public lpComponent; // Token that represents ownership in a pool, not always used
     // address public reward; // Token we farm
 
@@ -19,7 +19,7 @@ contract MyStrategy is BaseStrategy {
         __BaseStrategy_init(_vault);
         /// @dev Add config here
         want = _wantConfig[0];
-        
+
         // If you need to set new values that are not constants, set them like so
         // stakingContract = 0x79ba8b76F61Db3e7D994f7E384ba8f7870A043b7;
 
@@ -29,7 +29,7 @@ contract MyStrategy is BaseStrategy {
         //     type(uint256).max
         // );
     }
-    
+
     /// @dev Return the name of the strategy
     function getName() external pure override returns (string memory) {
         return "MyStrategy";
@@ -47,7 +47,7 @@ contract MyStrategy is BaseStrategy {
 
     /// @dev Deposit `_amount` of want, investing it to earn yield
     function _deposit(uint256 _amount) internal override {
-        // Add code here to invest `_amount` of want to earn yield 
+        // Add code here to invest `_amount` of want to earn yield
     }
 
     /// @dev Withdraw all funds, this is used for migrations, most of the time for emergency reasons
@@ -64,9 +64,8 @@ contract MyStrategy is BaseStrategy {
         return _amount;
     }
 
-
     /// @dev Does this function require `tend` to be called?
-    function _isTendable() internal override pure returns (bool) {
+    function _isTendable() internal pure override returns (bool) {
         return false; // Change to true if the strategy should be tended
     }
 
@@ -81,21 +80,20 @@ contract MyStrategy is BaseStrategy {
 
         // keep this to get paid!
         _reportToVault(0);
-        
+
         // Use this if your strategy doesn't sell the extra tokens
         // This will take fees and send the token to the badgerTree
-        _processExtraToken(token, amount);
+        // _processExtraToken(token, amount);
 
         return harvested;
     }
 
-
     // Example tend is a no-op which returns the values, could also just revert
-    function _tend() internal override returns (TokenAmount[] memory tended){
+    function _tend() internal override returns (TokenAmount[] memory tended) {
         // Nothing tended
         tended = new TokenAmount[](2);
         tended[0] = TokenAmount(want, 0);
-        tended[1] = TokenAmount(BADGER, 0); 
+        tended[1] = TokenAmount(BADGER, 0);
         return tended;
     }
 
@@ -111,7 +109,7 @@ contract MyStrategy is BaseStrategy {
         // Rewards are 0
         rewards = new TokenAmount[](2);
         rewards[0] = TokenAmount(want, 0);
-        rewards[1] = TokenAmount(BADGER, 0); 
+        rewards[1] = TokenAmount(BADGER, 0);
         return rewards;
     }
 }
