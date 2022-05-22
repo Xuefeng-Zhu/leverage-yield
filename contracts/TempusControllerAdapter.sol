@@ -31,11 +31,7 @@ contract TempusControllerAdapter {
     ICreditFilter public creditFilter;
     address public controller;
 
-    constructor(
-        address _creditManager,
-        address _creditFilter,
-        address _controller
-    ) public {
+    constructor(address _creditManager, address _controller) public {
         creditManager = ICreditManager(_creditManager);
         creditFilter = ICreditFilter(creditManager.creditFilter());
         controller = _controller;
@@ -62,9 +58,9 @@ contract TempusControllerAdapter {
         tokenOut[2] = tempusAMM;
 
         uint256[] memory amountOut = new uint256[](3);
-        amountOut[0] = IERC20Upgradeable(tokenOut[0]).balanceOf(address(this));
-        amountOut[1] = IERC20Upgradeable(tokenOut[1]).balanceOf(address(this));
-        amountOut[2] = IERC20Upgradeable(tokenOut[2]).balanceOf(address(this));
+        amountOut[0] = IERC20Upgradeable(tokenOut[0]).balanceOf(creditAccount);
+        amountOut[1] = IERC20Upgradeable(tokenOut[1]).balanceOf(creditAccount);
+        amountOut[2] = IERC20Upgradeable(tokenOut[2]).balanceOf(creditAccount);
 
         creditManager.provideCreditAccountAllowance(creditAccount, controller, token);
 
@@ -83,9 +79,9 @@ contract TempusControllerAdapter {
         address[] memory tokenIn = new address[](1);
         tokenIn[0] = token;
 
-        amountOut[0] = IERC20Upgradeable(tokenOut[0]).balanceOf(address(this)).sub(amountOut[0]);
-        amountOut[1] = IERC20Upgradeable(tokenOut[1]).balanceOf(address(this)).sub(amountOut[1]);
-        amountOut[2] = IERC20Upgradeable(tokenOut[2]).balanceOf(address(this)).sub(amountOut[2]);
+        amountOut[0] = IERC20Upgradeable(tokenOut[0]).balanceOf(creditAccount).sub(amountOut[0]);
+        amountOut[1] = IERC20Upgradeable(tokenOut[1]).balanceOf(creditAccount).sub(amountOut[1]);
+        amountOut[2] = IERC20Upgradeable(tokenOut[2]).balanceOf(creditAccount).sub(amountOut[2]);
 
         creditFilter.checkMultiTokenCollateral(creditAccount, amountIn, amountOut, tokenIn, tokenOut);
     }
@@ -113,9 +109,9 @@ contract TempusControllerAdapter {
         tokenOut[2] = tempusAMM;
 
         uint256[] memory amountOut = new uint256[](3);
-        amountOut[0] = IERC20Upgradeable(tokenOut[0]).balanceOf(address(this));
-        amountOut[1] = IERC20Upgradeable(tokenOut[1]).balanceOf(address(this));
-        amountOut[2] = IERC20Upgradeable(tokenOut[2]).balanceOf(address(this));
+        amountOut[0] = IERC20Upgradeable(tokenOut[0]).balanceOf(creditAccount);
+        amountOut[1] = IERC20Upgradeable(tokenOut[1]).balanceOf(creditAccount);
+        amountOut[2] = IERC20Upgradeable(tokenOut[2]).balanceOf(creditAccount);
 
         creditManager.provideCreditAccountAllowance(creditAccount, controller, token);
 
@@ -136,9 +132,9 @@ contract TempusControllerAdapter {
         address[] memory tokenIn = new address[](1);
         tokenIn[0] = token;
 
-        amountOut[0] = IERC20Upgradeable(tokenOut[0]).balanceOf(address(this)).sub(amountOut[0]);
-        amountOut[1] = IERC20Upgradeable(tokenOut[1]).balanceOf(address(this)).sub(amountOut[1]);
-        amountOut[2] = IERC20Upgradeable(tokenOut[2]).balanceOf(address(this)).sub(amountOut[2]);
+        amountOut[0] = IERC20Upgradeable(tokenOut[0]).balanceOf(creditAccount).sub(amountOut[0]);
+        amountOut[1] = IERC20Upgradeable(tokenOut[1]).balanceOf(creditAccount).sub(amountOut[1]);
+        amountOut[2] = IERC20Upgradeable(tokenOut[2]).balanceOf(creditAccount).sub(amountOut[2]);
 
         creditFilter.checkMultiTokenCollateral(creditAccount, amountIn, amountOut, tokenIn, tokenOut);
     }
@@ -166,9 +162,9 @@ contract TempusControllerAdapter {
         tokenOut[2] = tempusAMM;
 
         uint256[] memory amountOut = new uint256[](3);
-        amountOut[0] = IERC20Upgradeable(tokenOut[0]).balanceOf(address(this));
-        amountOut[1] = IERC20Upgradeable(tokenOut[1]).balanceOf(address(this));
-        amountOut[2] = IERC20Upgradeable(tokenOut[2]).balanceOf(address(this));
+        amountOut[0] = IERC20Upgradeable(tokenOut[0]).balanceOf(creditAccount);
+        amountOut[1] = IERC20Upgradeable(tokenOut[1]).balanceOf(creditAccount);
+        amountOut[2] = IERC20Upgradeable(tokenOut[2]).balanceOf(creditAccount);
 
         creditManager.provideCreditAccountAllowance(creditAccount, controller, token);
 
@@ -189,9 +185,9 @@ contract TempusControllerAdapter {
         address[] memory tokenIn = new address[](1);
         tokenIn[0] = token;
 
-        amountOut[0] = IERC20Upgradeable(tokenOut[0]).balanceOf(address(this)).sub(amountOut[0]);
-        amountOut[1] = IERC20Upgradeable(tokenOut[1]).balanceOf(address(this)).sub(amountOut[1]);
-        amountOut[2] = IERC20Upgradeable(tokenOut[2]).balanceOf(address(this)).sub(amountOut[2]);
+        amountOut[0] = IERC20Upgradeable(tokenOut[0]).balanceOf(creditAccount).sub(amountOut[0]);
+        amountOut[1] = IERC20Upgradeable(tokenOut[1]).balanceOf(creditAccount).sub(amountOut[1]);
+        amountOut[2] = IERC20Upgradeable(tokenOut[2]).balanceOf(creditAccount).sub(amountOut[2]);
 
         creditFilter.checkMultiTokenCollateral(creditAccount, amountIn, amountOut, tokenIn, tokenOut);
     }
@@ -207,7 +203,7 @@ contract TempusControllerAdapter {
         }
 
         uint256[] memory amountOut = new uint256[](1);
-        amountOut[0] = IERC20Upgradeable(tokenOut[0]).balanceOf(address(this));
+        amountOut[0] = IERC20Upgradeable(tokenOut[0]).balanceOf(creditAccount);
 
         address[] memory tokenIn = new address[](3);
 
@@ -220,7 +216,7 @@ contract TempusControllerAdapter {
         creditManager.provideCreditAccountAllowance(creditAccount, controller, tokenIn[2]);
 
         exitAmmGivenLpAndRedeemHelper(exitAmmParam);
-        amountOut[0] = IERC20Upgradeable(tokenOut[0]).balanceOf(address(this)).sub(amountOut[0]);
+        amountOut[0] = IERC20Upgradeable(tokenOut[0]).balanceOf(creditAccount).sub(amountOut[0]);
 
         uint256[] memory amountIn = new uint256[](3);
         amountIn[0] = exitAmmParam.lpTokens;

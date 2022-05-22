@@ -14,7 +14,7 @@ interface ICErc20 {
      * @param owner The address of the account to query
      * @return The amount of underlying owned by `owner`
      */
-    function balanceOfUnderlying(address owner) external returns (uint256);
+    function balanceOfUnderlying(address owner) external view returns (uint256);
 
     /**
      * @notice Supply ERC20 token to the market, receive cTokens in exchange.
@@ -38,15 +38,34 @@ interface ICErc20 {
     function underlying() external returns (address);
 }
 
+interface IComptroller {
+    /**
+     * @notice Claim all the comp accrued by the holder in all markets.
+     *
+     * @param holder The address to claim COMP for
+     */
+    function claimComp(address holder) external;
+
+    function compAccrued(address) external view returns (uint256);
+}
+
 contract CompoundAdapter {
     using SafeMathUpgradeable for uint256;
 
     ICreditManager public creditManager;
     ICreditFilter public creditFilter;
+    address public comptroller;
+    address public compoundToken;
 
-    constructor(address _creditManager, address _creditFilter) public {
+    constructor(
+        address _creditManager,
+        address _comptroller,
+        address _compoundToken
+    ) public {
         creditManager = ICreditManager(_creditManager);
         creditFilter = ICreditFilter(creditManager.creditFilter());
+        comptroller = _comptroller;
+        compoundToken = _compoundToken;
     }
 
     function mint(address cErc20, uint256 amount) external {
@@ -56,7 +75,7 @@ contract CompoundAdapter {
         address[] memory tokenOut = new address[](1);
         tokenOut[0] = cErc20;
         uint256[] memory amountOut = new uint256[](1);
-        amountOut[0] = IERC20Upgradeable(tokenOut[0]).balanceOf(address(this));
+        amountOut[0] = IERC20Upgradeable(tokenOut[0]).balanceOf(creditAccount);
 
         creditManager.provideCreditAccountAllowance(creditAccount, cErc20, underlying);
         bytes memory data = abi.encodeWithSelector(ICErc20.mint.selector, amount);
@@ -66,7 +85,7 @@ contract CompoundAdapter {
         amountIn[0] = amount;
         address[] memory tokenIn = new address[](1);
         tokenIn[0] = underlying;
-        amountOut[0] = IERC20Upgradeable(tokenOut[0]).balanceOf(address(this)).sub(amountOut[0]);
+        amountOut[0] = IERC20Upgradeable(tokenOut[0]).balanceOf(creditAccount).sub(amountOut[0]);
         creditFilter.checkMultiTokenCollateral(creditAccount, amountIn, amountOut, tokenIn, tokenOut);
     }
 
@@ -77,7 +96,7 @@ contract CompoundAdapter {
         address[] memory tokenIn = new address[](1);
         tokenIn[0] = underlying;
         uint256[] memory amountIn = new uint256[](1);
-        amountIn[0] = IERC20Upgradeable(tokenIn[0]).balanceOf(address(this));
+        amountIn[0] = IERC20Upgradeable(tokenIn[0]).balanceOf(creditAccount);
 
         bytes memory data = abi.encodeWithSelector(ICErc20.redeemUnderlying.selector, amount);
         creditManager.executeOrder(msg.sender, cErc20, data);
@@ -86,7 +105,25 @@ contract CompoundAdapter {
         tokenOut[0] = cErc20;
         uint256[] memory amountOut = new uint256[](1);
         amountOut[0] = amount;
-        amountIn[0] = IERC20Upgradeable(tokenIn[0]).balanceOf(address(this)).sub(amountIn[0]);
+        amountIn[0] = IERC20Upgradeable(tokenIn[0]).balanceOf(creditAccount).sub(amountIn[0]);
+        creditFilter.checkMultiTokenCollateral(creditAccount, amountIn, amountOut, tokenIn, tokenOut);
+    }
+
+    function claimComp() external {
+        address creditAccount = creditManager.getCreditAccountOrRevert(msg.sender);
+
+        address[] memory tokenIn;
+        uint256[] memory amountIn;
+
+        address[] memory tokenOut = new address[](1);
+        tokenOut[0] = compoundToken;
+        uint256[] memory amountOut = new uint256[](1);
+        amountOut[0] = IERC20Upgradeable(compoundToken).balanceOf(creditAccount);
+
+        bytes memory data = abi.encodeWithSelector(IComptroller.claimComp.selector);
+        creditManager.executeOrder(msg.sender, comptroller, data);
+
+        amountOut[0] = IERC20Upgradeable(compoundToken).balanceOf(creditAccount).sub(amountOut[0]);
         creditFilter.checkMultiTokenCollateral(creditAccount, amountIn, amountOut, tokenIn, tokenOut);
     }
 }
